@@ -3,6 +3,9 @@ rm broker/*.class
 rm market/*.class
 rm router/*.class
 
-#javac broker/Broker.java
+javac broker/Broker.java
 #javac market/Market.java
-#javac router/Router.java
+javac router/Router.java
+
+java router/Router.java
+
