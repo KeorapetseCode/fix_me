@@ -15,7 +15,9 @@ public class Router {
             server = new ServerSocket(5000);
             System.out.println("Waiting...");
             soc = server.accept();
+
             System.out.println("Connected with broker");
+           
             
             InputStreamReader inReader = new InputStreamReader(soc.getInputStream());
             BufferedReader bufRead = new BufferedReader(inReader);
