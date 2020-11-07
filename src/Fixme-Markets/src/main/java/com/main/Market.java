@@ -10,7 +10,8 @@ public class Market {
     public static void main(String[] args) {
         try {
             SocketChannel market = SocketChannel.open(new InetSocketAddress("localhost",5001));
-            //market.configureBlocking(false);
+			//market.configureBlocking(false);
+			//PrintWriter pr = new PrintWriter(client.socket().getInputStream());
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
 			byte[] arr1 = new byte[buffer.limit()];
 

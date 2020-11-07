@@ -5,11 +5,13 @@ package com.main;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.nio.Buffer;
+//import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Set;
+import java.io.PrintWriter;
+import java.io.BufferedReader;
 //--------------------------------ROUTER-------------------
 public class Router {
     public static Selector selector = null;
@@ -20,15 +22,7 @@ public class Router {
 
         try {
             selector = Selector.open();
-			/*
-			for (int port: ports) {
-                ServerSocketChannel serverChannel = ServerSocketChannel.open();
-                ServerSocket channel = serverChannel.socket();
-                channel.bind(new InetSocketAddress(host, port));
-                serverChannel.configureBlocking(false);
-                serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-			}
-			*/
+			
 			ServerSocketChannel serverChannelm = ServerSocketChannel.open();
 			ServerSocket channelm = serverChannelm.socket();
 			channelm.bind(new InetSocketAddress(host, 5001));
@@ -38,10 +32,15 @@ public class Router {
 
 			ServerSocketChannel serverChannel = ServerSocketChannel.open();
 			ServerSocket channel = serverChannel.socket();
+			
+
 			channel.bind(new InetSocketAddress(host, 5000));
 			serverChannel.configureBlocking(false);
 			serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-
+			/*
+			PrintWriter out = new PrintWriter(socket.getOutputStream());
+			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			*/
             System.out.println("Router ready for connection...");
             while (true){
 				selector.select();
@@ -57,11 +56,11 @@ public class Router {
 					}
 					else if (key.isReadable()){
 						handleRead(key, selector);
-					}
+					}/*
 					else if (key.isWritable()){
 						handleWrite(key, selector);
 						//System.out.println("Writable From Server@@@@@@@@@@@@@ " + "\n");
-					}
+					}*/
 					keys.remove();
 				}
             }
@@ -86,16 +85,14 @@ public class Router {
             System.out.println("Market has connected, Port 5001");
     }
 
-
     public static void handleRead(SelectionKey key, Selector select){
 		try{
 			System.out.println("Reading...");
 			SocketChannel client = (SocketChannel) key.channel();
+			client.configureBlocking(false);
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
 
 			client.read(buffer);
-			//buffer.flip();
-			client.register(selector, SelectionKey.OP_WRITE);
 			String data = new String(buffer.array()).trim();
 			if (data.length() > 0){
 				//System.out.println("Received message: " + data);
@@ -105,6 +102,9 @@ public class Router {
 					}
 					else if (data.equalsIgnoreCase("exit") == false){
 						System.out.println("Something else Message: " + data);
+						if (data.equals("buy") || data.equals("sell")){
+							client.register(selector, SelectionKey.OP_WRITE);
+						}
 					}
 			}
 			else{
@@ -132,9 +132,12 @@ public class Router {
 			System.out.print("Market Response.....");
 			SocketChannel client = (SocketChannel) key.channel();
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+			client.write(buffer);
+			buffer.flip();
 			String data = new String(buffer.array()).trim();
 			System.out.println("data from handleWrite: " + data);
-			
+
 			if (data.length() > 0){
 				//System.out.println("Received message: " + data);
 					if (data.equalsIgnoreCase("exit") == true) {

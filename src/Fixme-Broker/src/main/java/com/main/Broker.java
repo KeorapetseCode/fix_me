@@ -16,13 +16,14 @@ public class Broker {
 		try {
 			
 			SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 5000));
-			PrintWriter pr = new PrintWriter(client.socket().getOutputStream());
+			client.configureBlocking(false);
+			//PrintWriter pr = new PrintWriter(client.socket().getOutputStream());
 			Scanner scanner = new Scanner(System.in);
-			
+			String inStr = null;
+
 			while (scanner.hasNextLine()){
-				
-				String inStr = scanner.next();
-				
+
+				inStr = scanner.next();
 				System.out.println("Prepared message: " + inStr);
 				ByteBuffer buffer = ByteBuffer.allocate(1024);
 				buffer.put(inStr.getBytes());
@@ -33,7 +34,7 @@ public class Broker {
 				//System.out.println(String.format("Sending Message from client 1: %s\nbufforBytes: %d", inStr, bytesWritten));
 			}
 			//pr.println(inStr);
-			pr.flush();
+			scanner.close();
 			client.close();
 			System.out.println("Client 1 connection closed!!!!");
 		}
