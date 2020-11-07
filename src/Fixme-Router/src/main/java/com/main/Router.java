@@ -1,6 +1,6 @@
 package com.main;
 
-import com.sun.org.apache.bcel.internal.generic.Select;
+//import com.sun.org.apache.bcel.internal.generic.Select;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -31,11 +31,11 @@ public class Router {
 			*/
 			ServerSocketChannel serverChannelm = ServerSocketChannel.open();
 			ServerSocket channelm = serverChannelm.socket();
-			channelm.bind(new InetSocketAddress(host, 50001));
+			channelm.bind(new InetSocketAddress(host, 5001));
 			serverChannelm.configureBlocking(false);
 			serverChannelm.register(selector, SelectionKey.OP_ACCEPT);
+			//___________________________________________________________________
 
-			//__________________________________________
 			ServerSocketChannel serverChannel = ServerSocketChannel.open();
 			ServerSocket channel = serverChannel.socket();
 			channel.bind(new InetSocketAddress(host, 5000));
@@ -58,6 +58,10 @@ public class Router {
 					else if (key.isReadable()){
 						handleRead(key, selector);
 					}
+					else if (key.isWritable()){
+						handleWrite(key, selector);
+						//System.out.println("Writable From Server@@@@@@@@@@@@@ " + "\n");
+					}
 					keys.remove();
 				}
             }
@@ -68,20 +72,19 @@ public class Router {
         }
     }
 
-
     public static void connectedPort(SelectionKey key, Selector selector) throws IOException {
         System.out.println("Connecting From connectPort...");
         ServerSocketChannel server = (ServerSocketChannel) key.channel();
-        SocketChannel channel = server.accept();
+		
+		SocketChannel channel = server.accept();
         channel.configureBlocking(false);
         channel.register(selector, SelectionKey.OP_READ);
-
+		
         if (server.socket().getLocalPort() == 5000)
             System.out.println("Broker has connected, Port 5000");
         else if (server.socket().getLocalPort() == 5001)
             System.out.println("Market has connected, Port 5001");
     }
-
 
 
     public static void handleRead(SelectionKey key, Selector select){
@@ -91,6 +94,8 @@ public class Router {
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
 
 			client.read(buffer);
+			//buffer.flip();
+			client.register(selector, SelectionKey.OP_WRITE);
 			String data = new String(buffer.array()).trim();
 			if (data.length() > 0){
 				//System.out.println("Received message: " + data);
@@ -111,16 +116,43 @@ public class Router {
 			System.out.println("Error In handle read");
 			err.printStackTrace();
 		}
-        /*if (client.socket().getLocalPort() == 5000){
+		/*
+		if (client.socket().getLocalPort() == 5000){
             brokerToMarket(buffer, client);
             client.register(select, SelectionKey.OP_READ);
         }
         else if (client.socket().getLocalPort() == 5001){
 
             client.register(select, SelectionKey.OP_READ);
-        }*/
+		}
+		*/
     }
-
+	public static void handleWrite(SelectionKey key, Selector select){
+		try{
+			System.out.print("Market Response.....");
+			SocketChannel client = (SocketChannel) key.channel();
+			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			String data = new String(buffer.array()).trim();
+			System.out.println("data from handleWrite: " + data);
+			
+			if (data.length() > 0){
+				//System.out.println("Received message: " + data);
+					if (data.equalsIgnoreCase("exit") == true) {
+						client.close();
+						System.out.println("Connection closed...");
+					}
+					else if (data.equalsIgnoreCase("exit") == false){
+						System.out.println("data from Broker: " + data);
+					}
+			}else{
+				System.out.println("There's nothing for handle write");
+				client.close();
+			}
+		}
+		catch(IOException erl){
+			erl.printStackTrace();
+		}
+	}
 
     public static void brokerToMarket(ByteBuffer buffer, SocketChannel channel) throws IOException{
         String msg = "Broker testing...";
