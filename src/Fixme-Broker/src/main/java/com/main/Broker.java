@@ -1,7 +1,6 @@
 package com.main;
 
 //import com.sun.tools.jdeprscan.scan.Scan;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -9,22 +8,31 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Scanner;
-import java.io.PrintWriter;
+//import com.main.Transaction;
 //								BROKER Is Client 1.........................
 public class Broker {
     public static void main(String[] args) {
+		
 		try {
-			
 			SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 5000));
 			client.configureBlocking(false);
-			//PrintWriter pr = new PrintWriter(client.socket().getOutputStream());
+			String[] inStr = {"String From Broker", "Second String", "exit"};
+			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			
+			for (String msg : inStr){
+
+				buffer.put(msg.getBytes());
+				buffer.flip();
+				int bytesWritten = client.write(buffer);
+			}
+			System.out.println("Broker is closing!!!!");
+			client.close();
+			/*
 			Scanner scanner = new Scanner(System.in);
 			String inStr = null;
-
-			while (scanner.hasNextLine()){
-
+			while (true){
 				inStr = scanner.next();
-				System.out.println("Prepared message: " + inStr);
+				
 				ByteBuffer buffer = ByteBuffer.allocate(1024);
 				buffer.put(inStr.getBytes());
 				buffer.flip();
@@ -37,6 +45,7 @@ public class Broker {
 			scanner.close();
 			client.close();
 			System.out.println("Client 1 connection closed!!!!");
+			*/
 		}
 		catch (IOException e) {
 			e.printStackTrace();

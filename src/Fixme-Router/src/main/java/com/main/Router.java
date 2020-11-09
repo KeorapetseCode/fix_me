@@ -5,7 +5,6 @@ package com.main;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-//import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
@@ -22,26 +21,25 @@ public class Router {
 
         try {
             selector = Selector.open();
-			
+			/*
 			ServerSocketChannel serverChannelm = ServerSocketChannel.open();
+			serverChannelm.configureBlocking(false);
 			ServerSocket channelm = serverChannelm.socket();
 			channelm.bind(new InetSocketAddress(host, 5001));
 			serverChannelm.configureBlocking(false);
 			serverChannelm.register(selector, SelectionKey.OP_ACCEPT);
+			*/
 			//___________________________________________________________________
 
 			ServerSocketChannel serverChannel = ServerSocketChannel.open();
-			ServerSocket channel = serverChannel.socket();
-			
-
-			channel.bind(new InetSocketAddress(host, 5000));
 			serverChannel.configureBlocking(false);
+			ServerSocket channel = serverChannel.socket();
+			channel.bind(new InetSocketAddress(host, 5001));
+
 			serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-			/*
-			PrintWriter out = new PrintWriter(socket.getOutputStream());
-			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			*/
-            System.out.println("Router ready for connection...");
+			//serverChannel.register(selector, SelectionKey.OP_WRITE);
+			
+			System.out.println("Router ready for connection...");
             while (true){
 				selector.select();
 				Set<SelectionKey> selectedKeys = selector.selectedKeys();
@@ -49,18 +47,16 @@ public class Router {
 				
 				while (keys.hasNext()){
                     SelectionKey key = keys.next();
-					//System.out.println(keys.next() + "--------");
-					
                     if (key.isAcceptable()){
                         connectedPort(key, selector);
 					}
 					else if (key.isReadable()){
 						handleRead(key, selector);
-					}/*
+					}
 					else if (key.isWritable()){
 						handleWrite(key, selector);
 						//System.out.println("Writable From Server@@@@@@@@@@@@@ " + "\n");
-					}*/
+					}
 					keys.remove();
 				}
             }
@@ -73,11 +69,12 @@ public class Router {
 
     public static void connectedPort(SelectionKey key, Selector selector) throws IOException {
         System.out.println("Connecting From connectPort...");
-        ServerSocketChannel server = (ServerSocketChannel) key.channel();
+		
+		ServerSocketChannel server = (ServerSocketChannel) key.channel();
 		
 		SocketChannel channel = server.accept();
         channel.configureBlocking(false);
-        channel.register(selector, SelectionKey.OP_READ);
+        channel.register(selector, SelectionKey.OP_WRITE);
 		
         if (server.socket().getLocalPort() == 5000)
             System.out.println("Broker has connected, Port 5000");
@@ -86,6 +83,7 @@ public class Router {
     }
 
     public static void handleRead(SelectionKey key, Selector select){
+		
 		try{
 			System.out.println("Reading...");
 			SocketChannel client = (SocketChannel) key.channel();
@@ -101,10 +99,9 @@ public class Router {
 						System.out.println("Connection closed...");
 					}
 					else if (data.equalsIgnoreCase("exit") == false){
-						System.out.println("Something else Message: " + data);
-						if (data.equals("buy") || data.equals("sell")){
-							client.register(selector, SelectionKey.OP_WRITE);
-						}
+						System.out.println("Reading Message From Handle Read+: " + data);
+						//if (data.equals("buy") || data.equals("sell"))
+							//client.register(selector, SelectionKey.OP_WRITE);
 					}
 			}
 			else{
@@ -129,15 +126,23 @@ public class Router {
     }
 	public static void handleWrite(SelectionKey key, Selector select){
 		try{
-			System.out.print("Market Response.....");
+			System.out.print("In Handle Write.....");
 			SocketChannel client = (SocketChannel) key.channel();
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-			client.write(buffer);
+			//System.out.println("Buffer position " + buffer.position() + "\n");
+			//System.out.println("Buffer limit " + buffer.limit());
+			String mesg = "Message From Server Router";
+			buffer.put(mesg.getBytes());
 			buffer.flip();
-			String data = new String(buffer.array()).trim();
-			System.out.println("data from handleWrite: " + data);
-
+			client.write(buffer);
+			//client.close();
+			/*
+			System.out.println("Buffer 2" + buffer.position() + "\n");
+			System.out.println("Buffer 2" + buffer.limit());
+			*/
+			//String data = new String(buffer.array()).trim();
+			//System.out.println("data from handleWrite: " + data);
+			/*
 			if (data.length() > 0){
 				//System.out.println("Received message: " + data);
 					if (data.equalsIgnoreCase("exit") == true) {
@@ -150,9 +155,10 @@ public class Router {
 			}else{
 				System.out.println("There's nothing for handle write");
 				client.close();
-			}
+			}*/
 		}
 		catch(IOException erl){
+			System.out.println("Error In handleWrite");
 			erl.printStackTrace();
 		}
 	}
