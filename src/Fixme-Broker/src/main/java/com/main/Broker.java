@@ -14,20 +14,8 @@ public class Broker {
     public static void main(String[] args) {
 		
 		try {
-			SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 5000));
+			SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 4000));
 			client.configureBlocking(false);
-			String[] inStr = {"String From Broker", "Second String", "exit"};
-			ByteBuffer buffer = ByteBuffer.allocate(1024);
-			
-			for (String msg : inStr){
-
-				buffer.put(msg.getBytes());
-				buffer.flip();
-				int bytesWritten = client.write(buffer);
-			}
-			System.out.println("Broker is closing!!!!");
-			client.close();
-			/*
 			Scanner scanner = new Scanner(System.in);
 			String inStr = null;
 			while (true){
@@ -39,13 +27,12 @@ public class Broker {
 				int bytesWritten = client.write(buffer);
 				if (inStr.equals("exit"))
 					break ;
-				//System.out.println(String.format("Sending Message from client 1: %s\nbufforBytes: %d", inStr, bytesWritten));
+				System.out.println(String.format("Sending Message from Broker: %s\nbufforBytes: %d", inStr, bytesWritten));
 			}
 			//pr.println(inStr);
 			scanner.close();
 			client.close();
 			System.out.println("Client 1 connection closed!!!!");
-			*/
 		}
 		catch (IOException e) {
 			e.printStackTrace();
