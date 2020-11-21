@@ -22,7 +22,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.main.Router</mainClass>
+                            <mainClass>com.main.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
