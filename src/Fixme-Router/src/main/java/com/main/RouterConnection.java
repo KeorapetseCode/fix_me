@@ -64,24 +64,24 @@ public class RouterConnection extends Thread {
     private void runServer() {
         //System.out.println("In RouterConnection runServer");
         this.componentId = assignIdToComponent(this.component);
-
         try {
             serverSocketChannel = ServerSocketChannel.open().bind(new InetSocketAddress(this.hostIP, this.port));
 
             System.out.println(String.format("Server listening on port: %d", this.port));
 
-        //    while (true) {
-                System.out.println("In RouterConnection runServer while loop");
-                socketChannel = serverSocketChannel.accept();
-                System.out.println("After accept() in RouterConnection runServer while loop");
+            while (true) {
+                Main.printStr("In RouterConnection runServer loop as " + this.component.toString());
+				socketChannel = serverSocketChannel.accept();
+                //System.out.println("After accept() in RouterConnection runServer while loop");
                 socketHandlerAsync = new Handler(socketChannel, this.componentList.size(), messages, this.port, this.componentId, this.component.toString());
-                System.out.println(String.format("%s connected, Id: %s", this.component.toString(), this.componentId));
+                System.out.println(String.format("%s connected", this.component.toString()));
                 this.componentList.add(socketHandlerAsync);
-                //this.socketHandlerAsync.start();
-        //    }
+                this.socketHandlerAsync.start();
+            }
         } catch (IOException e) {
             System.out.println("Disconnected");
-        }
+			e.printStackTrace();
+		}
     }
 
     public void sendMessage(String str) {
@@ -89,7 +89,7 @@ public class RouterConnection extends Thread {
     }
 
     public String getMessages() {
-        return this.socketHandlerAsync.getMessages();
+		return this.socketHandlerAsync.getMessages();
     }
 
     // return this server's ID
@@ -100,5 +100,5 @@ public class RouterConnection extends Thread {
     @Override
     public void run() {
         runServer();
-    }
+	}
 }

@@ -29,25 +29,22 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println("In Broker Main()");
         Selector selector = Selector.open();
-
         SocketChannel socketChannel = SocketChannel.open();
-
         socketChannel.configureBlocking(false);
-
         socketChannel.connect(new InetSocketAddress(host, port));
 
         socketChannel.register(selector, SelectionKey.OP_CONNECT | SelectionKey.OP_READ | SelectionKey.OP_WRITE);
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         
-        int exitInt = 12;
 
         while (true) {
+            printStr("In Broker Loop 1");
             if (selector.select() > 0) {
-                Iterator i = selector.selectedKeys().iterator();
+                Iterator <SelectionKey> i = selector.selectedKeys().iterator();
                 SelectionKey key = null;
                 while (i.hasNext()) {
+                    printStr("In Broker Loop 2");
                     key = (SelectionKey) i.next();
                     i.remove();
                 }
@@ -57,6 +54,7 @@ public class Main {
                 }
             }
         }
+        printStr("Socket Is closing");
         socketChannel.close();
     }
 
@@ -68,8 +66,12 @@ public class Main {
         }
         if (key.isReadable()) {
             readableKey(key);
-        }
+		}
         return false;
+    }
+
+    public static void printStr(String s){
+        System.out.println(s);
     }
 
     public static void readableKey(SelectionKey key) throws IOException {
@@ -80,13 +82,19 @@ public class Main {
 
         if (ID.isEmpty()) {
             ID = routerOutput;
-            System.out.println(" Broker ID: " + routerOutput);
+            System.out.println(" BroKer ID: " + routerOutput);
             Menu(socketChannel);
         } else {
             System.out.println(" Server response: " + routerOutput);
             setTime(routerOutput);
         }
-        Menu(socketChannel);
+		Menu(socketChannel);
+		if (socketChannel.isConnected()){
+			printStr("Sock Still Connected");
+		}
+		else{
+			printStr("Sock Closed");
+		}
     }
 
     public static Boolean processConnection(SelectionKey key) {
@@ -132,6 +140,7 @@ public class Main {
                 System.out.println("IO Exception caught: " + e);
             }
         }
+        printStr("End of Menu()");
     }
 
     public static String setFix(String choice) {

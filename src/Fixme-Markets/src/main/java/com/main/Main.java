@@ -38,7 +38,7 @@ public class Main {
             // get keys representing channels ready for IO
             if (selector.select() > 0) {
                 // if a channel ready for IO exists, set iterator for keys
-                Iterator i = selector.selectedKeys().iterator();
+                Iterator <SelectionKey> i = selector.selectedKeys().iterator();
                 // define selection key to hold selected key from selectedKeys
                 SelectionKey key = null;
 
@@ -47,7 +47,6 @@ public class Main {
                     key = (SelectionKey) i.next();
                     i.remove();
                 }
-
                 // process key, if connection failed/ended exit
                 if (processKey(key)) {
                     break;
@@ -75,7 +74,6 @@ public class Main {
         return true;
     }
 
-
     public static Boolean processKey(SelectionKey key) throws Exception {
         // if not connected already, finish connection
         if (key.isConnectable()) {
@@ -84,7 +82,6 @@ public class Main {
                 return true;
             }
         }
-
         // once connected, test if this channel is ready for reading
         if (key.isReadable()) {
             // if key is readable, carry out operations
@@ -110,7 +107,11 @@ public class Main {
             System.out.println(" Market ID: " + routerOutput);
 
         } else {
-            // this is a message from the broker (request)
+			// this is a message from the broker (request)
+			if (routerOutput.equals("exit")){
+				printStr("EXIT in readable!!!");
+				return ;
+			}
             System.out.println(" Message from broker: " + routerOutput);
             handleRequest(key, routerOutput);
         }
@@ -137,7 +138,11 @@ public class Main {
                 requestStatus = "rejected";
             }
             // if brokerRequest was sell
-        } else {
+		}
+		if (choice.equals("exit")){
+			printStr("Markets Should Exit");
+		}
+		else {
             // increment market quantity, brokerRequestStatus already pre-allocated 'accepted'
             time++;
         }
@@ -155,5 +160,9 @@ public class Main {
         } catch (IOException e) {
             System.out.println("request failed");
         }
-    }
+	}
+	
+    public static void printStr(String s){
+        System.out.println(s);
+	}
 }

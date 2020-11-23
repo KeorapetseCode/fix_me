@@ -10,12 +10,14 @@ public class Handler extends Thread {
     private List<String> messages;
     private String id;
     private String componentType;
-    private boolean runningClient;
+	private boolean runningClient;
+	private int prt;
 
     public Handler(SocketChannel socket, int clientListSize, List<String> messages, int port, String id, String componentType) {
         this.socket = socket;
         this.messages = messages;
-        this.id = id;
+		this.id = id;
+		this.prt = port;
         this.runningClient = true;
         this.componentType = componentType;
         sendMessage(id + " ");
@@ -47,26 +49,31 @@ public class Handler extends Thread {
     @Override
     public void run() {
         try {
-        //    while (this.runningClient) {
-                System.out.println("In Handler.java run() while loop");
-            //    if (Thread.currentThread().isAlive() == false)
-            //        break;
-
+        	while (this.runningClient) {
+                System.out.println("In Handler.java run() loop as " + componentType);
+            	if (Thread.currentThread().isAlive() == false)
+        	        break;
+				
                 if ((socket != null) && (socket.isOpen()) && this.runningClient) {
 
                     ByteBuffer buffer = ByteBuffer.allocate(2048);
                     socket.read(buffer);
                     String cmsg = new String(buffer.array()).trim();
                     System.out.println("Message from : " + componentType + " ID : " + this.id + " " + cmsg);
-
+					if (cmsg.equals("exit")){
+						Main.printStr("The string is Exit in Handler.java");
+						Thread.currentThread().interrupt();
+						break;
+					}
                     if (this.runningClient && !cmsg.isEmpty()) {
                         messages.add(cmsg);
                     }
                     buffer.flip();
                     buffer.clear();
                 }
-        //    }
-        } catch (IOException e) {
+            }
+		}
+		catch (IOException e) {
             System.out.println("DISCONNECTED FROM " + componentType + " ID : " + this.id);
             System.out.println("SERVER IS STILL RUNNING");
         }

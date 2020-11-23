@@ -19,37 +19,50 @@ public class Main {
 
         // while threads do not return interrupted Thread exception, continually check for messages
         while (true) {
+			//printStr("Router Loop!");
             try {
-                // get messages that broker client has sent to brokerServer
-                brokerMessages = brokerServer.getMessages();
-
-                if (brokerMessages.isEmpty())
-                    System.out.println("No messages");
-                else {
-                    // split broker message (broker request should be in fix format)
-                    if (brokerMessages.equals("exit")){
-                        System.out.println("Found exit in Router");
-                        break ;
-                    }
-                    String[] arr = brokerMessages.split("\\|");
-                    // get ID assigned to current market
-                    String targetID = marketServer.getComponentId();
-                    // insert Market ID as Broker Request targetID
-                    String brokerMessageTargeted = arr[0] + "|" + targetID + "|" + arr[2] + "|" + arr[3] + "|";
-                    marketServer.sendMessage(brokerMessageTargeted);
-                    brokerMessages = "";
-                }
-                marketMessages = marketServer.getMessages();
-                if (marketMessages.isEmpty())
-                    brokerServer.sendMessage(marketMessages);
-                else {
-                    brokerServer.sendMessage(marketMessages);
-                    marketMessages = "";
-                    System.out.println("Order processed");
-                }
+				if (brokerServer.socketHandlerAsync != null){
+					// get messages that broker client has sent to brokerServer	
+					brokerMessages = brokerServer.getMessages();
+					
+					if (brokerMessages.isEmpty())
+						System.out.println("No messages");
+					else {
+						// split broker message (broker request should be in fix format)
+						if (brokerMessages.equals("exit")){
+							System.out.println("Found exit in Router");
+						
+							brokerServer.socketHandlerAsync.interrupt();
+							brokerServer.interrupt();
+							
+							marketServer.socketHandlerAsync.interrupt();
+							marketServer.interrupt();
+							//brokerMessages = null;
+							break ;
+						}
+						String[] arr = brokerMessages.split("\\|");
+						// get ID assigned to current market
+						String targetID = marketServer.getComponentId();
+						// insert Market ID as Broker Request targetID
+						String brokerMessageTargeted = arr[0] + "|" + targetID + "|" + arr[2] + "|" + arr[3] + "|";
+						marketServer.sendMessage(brokerMessageTargeted);
+						brokerMessages = "";
+					}
+					marketMessages = marketServer.getMessages();
+					if (marketMessages.isEmpty())
+						brokerServer.sendMessage(marketMessages);
+					else {
+						brokerServer.sendMessage(marketMessages);
+						marketMessages = "";
+						System.out.println("Order processed");
+					}
+				}
             } catch (Exception e) {
-
-            }
+				e.printStackTrace();
+			}
         }
     }
+    public static void printStr(String s){
+        System.out.println(s);
+	}
 }
