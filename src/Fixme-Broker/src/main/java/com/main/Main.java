@@ -37,7 +37,6 @@ public class Main {
         socketChannel.register(selector, SelectionKey.OP_CONNECT | SelectionKey.OP_READ | SelectionKey.OP_WRITE);
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         
-
         while (true) {
             printStr("In Broker Loop 1");
             if (selector.select() > 0) {
@@ -51,7 +50,9 @@ public class Main {
                 if (processKey(key)){
                     System.out.println("Breaking!!!!! from processKey");
                     break;
-                }
+				}
+				else if(cancel == 3)
+					break;
             }
         }
         printStr("Socket Is closing");
@@ -83,18 +84,12 @@ public class Main {
         if (ID.isEmpty()) {
             ID = routerOutput;
             System.out.println(" BroKer ID: " + routerOutput);
-            Menu(socketChannel);
-        } else {
+		}
+		else {
             System.out.println(" Server response: " + routerOutput);
             setTime(routerOutput);
-        }
+		}
 		Menu(socketChannel);
-		if (socketChannel.isConnected()){
-			printStr("Sock Still Connected");
-		}
-		else{
-			printStr("Sock Closed");
-		}
     }
 
     public static Boolean processConnection(SelectionKey key) {
@@ -103,7 +98,8 @@ public class Main {
             while (socketChannel.isConnectionPending()) {
                 socketChannel.finishConnect();
             }
-        } catch (IOException e) {
+		}
+		catch (IOException e) {
             key.cancel();
             return false;
         }
@@ -120,7 +116,6 @@ public class Main {
                 if (input.equalsIgnoreCase("1") || (input.equalsIgnoreCase("2") && time > 0)) {
                     input = setFix(input);
                     socketChannel.write(ByteBuffer.wrap(input.getBytes()));
-                    return;
                 }
                 else if (input.equalsIgnoreCase("2") && time <= 0) {
                     System.out.println(" Nothing to sell ");
@@ -128,8 +123,7 @@ public class Main {
                 else if (input.equalsIgnoreCase("exit")){
                     System.out.println("Found Exit");
 					socketChannel.write(ByteBuffer.wrap(input.getBytes()));
-					socketChannel.close();
-                    //bufferedReader.close();
+					cancel = 3;
                     break;
                 }
                 else {

@@ -21,7 +21,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        // selects between channels
+		// selects between channels
         Selector selector = Selector.open();
         // create new channel for this connection
         SocketChannel socketChannel = SocketChannel.open();

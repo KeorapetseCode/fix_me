@@ -60,14 +60,9 @@ public class Handler extends Thread {
                     socket.read(buffer);
                     String cmsg = new String(buffer.array()).trim();
                     System.out.println("Message from : " + componentType + " ID : " + this.id + " " + cmsg);
-					if (cmsg.equals("exit")){
-						Main.printStr("The string is Exit in Handler.java");
-						Thread.currentThread().interrupt();
-						break;
-					}
-                    if (this.runningClient && !cmsg.isEmpty()) {
+					if (this.runningClient && !cmsg.isEmpty()) {
                         messages.add(cmsg);
-                    }
+					}
                     buffer.flip();
                     buffer.clear();
                 }
@@ -76,6 +71,7 @@ public class Handler extends Thread {
 		catch (IOException e) {
             System.out.println("DISCONNECTED FROM " + componentType + " ID : " + this.id);
             System.out.println("SERVER IS STILL RUNNING");
-        }
+		}
+		
     }
 }

@@ -19,10 +19,10 @@ public class Main {
 
         // while threads do not return interrupted Thread exception, continually check for messages
         while (true) {
-			//printStr("Router Loop!");
-            try {
-				if (brokerServer.socketHandlerAsync != null){
+			//printStr("Router l0op");
+            if (brokerServer.socketHandlerAsync != null){
 					// get messages that broker client has sent to brokerServer	
+				try {
 					brokerMessages = brokerServer.getMessages();
 					
 					if (brokerMessages.isEmpty())
@@ -32,12 +32,20 @@ public class Main {
 						if (brokerMessages.equals("exit")){
 							System.out.println("Found exit in Router");
 						
-							brokerServer.socketHandlerAsync.interrupt();
-							brokerServer.interrupt();
-							
-							marketServer.socketHandlerAsync.interrupt();
-							marketServer.interrupt();
-							//brokerMessages = null;
+							if (brokerServer.isAlive()){
+								printStr("bService is alive");
+								brokerServer.interrupt();
+							}
+							else{
+								printStr("fdfdf");
+							}
+							if (brokerServer.isAlive()){
+								printStr("bService is still Alive");
+							}
+							else{
+								printStr("f44444f");
+							}
+							System.out.println("After Thread interupt");
 							break ;
 						}
 						String[] arr = brokerMessages.split("\\|");
@@ -57,8 +65,9 @@ public class Main {
 						System.out.println("Order processed");
 					}
 				}
-            } catch (Exception e) {
-				e.printStackTrace();
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
         }
     }
