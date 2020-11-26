@@ -38,12 +38,12 @@ public class Main {
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         
         while (true) {
-            printStr("In Broker Loop 1");
+            //printStr("In Broker Loop 1");
             if (selector.select() > 0) {
                 Iterator <SelectionKey> i = selector.selectedKeys().iterator();
                 SelectionKey key = null;
                 while (i.hasNext()) {
-                    printStr("In Broker Loop 2");
+          //          printStr("In Broker Loop 2");
                     key = (SelectionKey) i.next();
                     i.remove();
                 }
@@ -55,7 +55,7 @@ public class Main {
 					break;
             }
         }
-        printStr("Socket Is closing");
+        //printStr("Socket Is closing");
         socketChannel.close();
     }
 
@@ -115,26 +115,21 @@ public class Main {
 
                 if (input.equalsIgnoreCase("1") || (input.equalsIgnoreCase("2") && time > 0)) {
                     input = setFix(input);
-                    socketChannel.write(ByteBuffer.wrap(input.getBytes()));
+					socketChannel.write(ByteBuffer.wrap(input.getBytes()));
+					return;
                 }
                 else if (input.equalsIgnoreCase("2") && time <= 0) {
                     System.out.println(" Nothing to sell ");
                 }
-                else if (input.equalsIgnoreCase("exit")){
-                    System.out.println("Found Exit");
-					socketChannel.write(ByteBuffer.wrap(input.getBytes()));
-					cancel = 3;
-                    break;
-                }
                 else {
+					socketChannel.write(ByteBuffer.wrap(input.getBytes()));
                     System.out.println(" invalid input ");
-                }
-
+					return;
+				}
             } catch (IOException e) {
                 System.out.println("IO Exception caught: " + e);
             }
         }
-        printStr("End of Menu()");
     }
 
     public static String setFix(String choice) {

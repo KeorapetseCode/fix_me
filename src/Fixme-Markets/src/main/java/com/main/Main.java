@@ -139,9 +139,6 @@ public class Main {
             }
             // if brokerRequest was sell
 		}
-		if (choice.equals("exit")){
-			printStr("Markets Should Exit");
-		}
 		else {
             // increment market quantity, brokerRequestStatus already pre-allocated 'accepted'
             time++;
@@ -163,6 +160,6 @@ public class Main {
 	}
 	
     public static void printStr(String s){
-        System.out.println(s);
+        System.out.println(s); 
 	}
 }

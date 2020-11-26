@@ -11,7 +11,6 @@ public class Main {
         // new Servers to connect market and broker to router
         RouterConnection brokerServer = new RouterConnection(brokerPort, TheComp.Broker);
         RouterConnection marketServer = new RouterConnection(marketPort, TheComp.Market);
-
         // start new threads for market and broker servers
         // allows market and broker servers to receive messages concurrently
         brokerServer.start();
@@ -19,49 +18,24 @@ public class Main {
 
         // while threads do not return interrupted Thread exception, continually check for messages
         while (true) {
-			//printStr("Router l0op");
-            if (brokerServer.socketHandlerAsync != null){
-					// get messages that broker client has sent to brokerServer	
+            brokerMessages = brokerServer.getMessages();
+            if (brokerMessages != "null"){
 				try {
-					brokerMessages = brokerServer.getMessages();
-					
-					if (brokerMessages.isEmpty())
-						System.out.println("No messages");
-					else {
-						// split broker message (broker request should be in fix format)
-						if (brokerMessages.equals("exit")){
-							System.out.println("Found exit in Router");
-						
-							if (brokerServer.isAlive()){
-								printStr("bService is alive");
-								brokerServer.interrupt();
-							}
-							else{
-								printStr("fdfdf");
-							}
-							if (brokerServer.isAlive()){
-								printStr("bService is still Alive");
-							}
-							else{
-								printStr("f44444f");
-							}
-							System.out.println("After Thread interupt");
-							break ;
-						}
+						printStr("Inside Else");
 						String[] arr = brokerMessages.split("\\|");
 						// get ID assigned to current market
 						String targetID = marketServer.getComponentId();
 						// insert Market ID as Broker Request targetID
 						String brokerMessageTargeted = arr[0] + "|" + targetID + "|" + arr[2] + "|" + arr[3] + "|";
 						marketServer.sendMessage(brokerMessageTargeted);
-						brokerMessages = "";
-					}
+						brokerMessages = "null";
+					//}
 					marketMessages = marketServer.getMessages();
 					if (marketMessages.isEmpty())
 						brokerServer.sendMessage(marketMessages);
 					else {
 						brokerServer.sendMessage(marketMessages);
-						marketMessages = "";
+						marketMessages = "null";
 						System.out.println("Order processed");
 					}
 				}
@@ -69,7 +43,7 @@ public class Main {
 					e.printStackTrace();
 				}
 			}
-        }
+		}
     }
     public static void printStr(String s){
         System.out.println(s);
