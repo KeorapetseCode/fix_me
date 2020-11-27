@@ -69,7 +69,7 @@ public class RouterConnection extends Thread {
             System.out.println(String.format("Server listening on port: %d", this.port));
 			
 		//	while (true) {
-        //        Main.printStr("In RouterConnection runServer loop as " + this.component.toString());
+                //Main.printStr("In RouterConnection runServer loop as " + this.component.toString());
 				socketChannel = serverSocketChannel.accept();
                 
                 socketHandlerAsync = new Handler(socketChannel, this.componentList.size(), messages, this.port, this.componentId, this.component.toString());

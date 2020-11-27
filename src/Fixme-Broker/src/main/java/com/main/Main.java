@@ -24,8 +24,9 @@ public class Main {
 	public static int targetID = 0;
 	public static int cancel = 0;
 
-    private static int time = 10;
+    private static int gold;
     public static int choice = 1;
+    private static int money = 100;
 
     public static void main(String[] args) throws Exception {
 
@@ -87,7 +88,7 @@ public class Main {
 		}
 		else {
             System.out.println(" Server response: " + routerOutput);
-            setTime(routerOutput);
+            setAsset(routerOutput);
 		}
 		Menu(socketChannel);
     }
@@ -109,24 +110,37 @@ public class Main {
     public static void Menu(SocketChannel socketChannel) {
         while (true) {
             try {
-                System.out.println(" Would you like to buy or sell 1 unit of time? \n Enter : 1 to buy or 2 to sell ");
-                // get choice
+                printStr(" Would you like to buy or sell units of gold? \n Enter : 1 to buy or 2 to sell ");
+
                 String input = bufferedReader.readLine();
 
-                if (input.equalsIgnoreCase("1") || (input.equalsIgnoreCase("2") && time > 0)) {
+                if (input.equalsIgnoreCase("1") && money > 19){
                     input = setFix(input);
 					socketChannel.write(ByteBuffer.wrap(input.getBytes()));
+                    money = money - 20;
+                    printStr("Option 1 is sent");
 					return;
                 }
-                else if (input.equalsIgnoreCase("2") && time <= 0) {
-                    System.out.println(" Nothing to sell ");
+                else if (input.equalsIgnoreCase("2")) {
+                    if (gold > 0){
+                        input = setFix(input);
+                        socketChannel.write(ByteBuffer.wrap(input.getBytes()));
+                        money = money + 20;
+                        printStr("Option 2 is sent");
+                        return;
+                    }/*
+                    else{
+                        printStr("Transaction unsuccessful you don't have enough assests");
+                    }*/
                 }
-                else {
-					socketChannel.write(ByteBuffer.wrap(input.getBytes()));
-                    System.out.println(" invalid input ");
-					return;
-				}
-            } catch (IOException e) {
+                else if(input.equalsIgnoreCase("exit")){
+                    printStr("Closing Application");
+                    socketChannel.write(ByteBuffer.wrap(input.getBytes()));
+				    socketChannel.close();
+                    System.exit(0);
+                }
+            }
+            catch (IOException e) {
                 System.out.println("IO Exception caught: " + e);
             }
         }
@@ -144,27 +158,24 @@ public class Main {
         return crc32.getValue();
     }
 
-    public static void setTime(String routerOutput) {
+    public static void setAsset(String routerOutput) {
 
         // split message to validate order status
         String[] routerOutputSplit = routerOutput.split("\\|");
 
-        // if order succeful update time
         if (routerOutputSplit[0].equals("accepted")) {
             if (routerOutputSplit[3].equals("1")) {
-                // if order way buy, increase time by one unit
-                time++;
-                System.out.println("time: " + time);
-            } else {
-                // if order was sell, decrease order by one unit
-                time--;
-                System.out.println("time: " + time);
+                gold++;
+                printStr("Gold Asset: " + gold);
             }
-            System.out.println(" order was sucessful and completed ");
-        } else {
-            System.out.println(" order was unsuccessful ");
+            else{
+                gold--;
+                printStr("Gold Asset: " + gold);
+            }
+            printStr(" order was sucessful and completed ");
+        }
+        else {
+            printStr(" order was unsuccessful ");
         }
     }
-
 }
-
