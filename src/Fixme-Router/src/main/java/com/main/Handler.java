@@ -62,7 +62,7 @@ public class Handler extends Thread {
                     ByteBuffer buffer = ByteBuffer.allocate(2048);
                     socket.read(buffer);
                     String cmsg = new String(buffer.array()).trim();
-                    //Main.printStr("Message from : " + componentType + " ID : " + this.id + " " + cmsg);
+                    Main.printStr("Message from : " + componentType + " ID : " + this.id + " " + cmsg);
 					if (this.runningClient && !cmsg.isEmpty()) {
 						messages.add(cmsg);
 						//Main.printStr("Message Sent");

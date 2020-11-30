@@ -79,17 +79,20 @@ public class Main {
         // very first message is the ID sent by router
         socketChannel.read(byteBuffer);
         String routerOutput = new String(byteBuffer.array()).trim();
-
+        //printStr("Router routerOutput " + routerOutput + " * ****");
         // if ID is not set, then this is the first message received ie.:ID
         if (ID.isEmpty()) {
             ID = routerOutput;
             System.out.println(" Market ID: " + routerOutput);
 
-        } else {
+        }
+        else {
 			// this is a message from the broker (request)
 			if (routerOutput.equals("exit")){
-				printStr("EXIT in readable!!!");
-				return ;
+				//printStr("EXIT in readable!!!");
+                socketChannel.close();
+                System.exit(0);
+                return ;
 			}
             System.out.println(" Message from broker: " + routerOutput);
             handleRequest(key, routerOutput);

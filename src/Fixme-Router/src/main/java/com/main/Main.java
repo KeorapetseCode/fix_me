@@ -7,6 +7,10 @@ public class Main {
     private static String brokerMessages = "";
     private static String marketMessages = "";
 
+    public static void printStr(String s){
+        System.out.println(s);
+	}
+
     public static void main(String[] args) {
 
         RouterConnection brokerServer = new RouterConnection(brokerPort, TheComp.Broker);
@@ -20,12 +24,13 @@ public class Main {
             if (brokerMessages != "null"){
 				try {
 						if (brokerMessages.equals("exit")){
-							
-							//brokerServer.
-							brokerServer.
+
+							marketServer.sendMessage(brokerMessages);
+
+							brokerServer.socketHandlerAsync.interrupt();
+							marketServer.socketHandlerAsync.interrupt();
 							brokerServer.interrupt();
 							marketServer.interrupt();
-
 							break ;
 						}
 						String[] arr = brokerMessages.split("\\|");
@@ -35,20 +40,15 @@ public class Main {
 						brokerMessages = "null";
 
 						marketMessages = marketServer.getMessages();
-						//if (marketMessages != "null"){
-							brokerServer.sendMessage(marketMessages);
-							marketMessages = "null";
-							System.out.println("Order processed");
-						//}
+						brokerServer.sendMessage(marketMessages);
+						marketMessages = "null";
+						System.out.println("Order processed");
 				}
 				catch (Exception e) {
+					printStr("In Router try catch");
 					e.printStackTrace();
 				}
 			}
 		}
-		printStr("End of Router Server");
     }
-    public static void printStr(String s){
-        System.out.println(s);
-	}
 }

@@ -67,18 +67,15 @@ public class RouterConnection extends Thread {
             serverSocketChannel = ServerSocketChannel.open().bind(new InetSocketAddress(this.hostIP, this.port));
 
             System.out.println(String.format("Server listening on port: %d", this.port));
-			
-		//	while (true) {
-                //Main.printStr("In RouterConnection runServer loop as " + this.component.toString());
-				socketChannel = serverSocketChannel.accept();
+			socketChannel = serverSocketChannel.accept();
                 
-                socketHandlerAsync = new Handler(socketChannel, this.componentList.size(), messages, this.port, this.componentId, this.component.toString());
-                System.out.println(String.format("%s connected", this.component.toString()));
-                this.componentList.add(socketHandlerAsync);
-				this.socketHandlerAsync.start();
-                //Main.printStr("After runServer() in RouterConnection");
-        //    }
-        } catch (IOException e) {
+            socketHandlerAsync = new Handler(socketChannel, this.componentList.size(), messages, this.port, this.componentId, this.component.toString());
+            Main.printStr(String.format("%s connected", this.component.toString()));
+            this.componentList.add(socketHandlerAsync);
+            this.socketHandlerAsync.start();
+
+        }
+        catch (IOException e) {
             System.out.println("Disconnected");
 			//.printStackTrace();
 		}

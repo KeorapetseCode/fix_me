@@ -128,10 +128,7 @@ public class Main {
                         money = money + 20;
                         printStr("Option 2 is sent");
                         return;
-                    }/*
-                    else{
-                        printStr("Transaction unsuccessful you don't have enough assests");
-                    }*/
+                    }
                 }
                 else if(input.equalsIgnoreCase("exit")){
                     printStr("Closing Application");
