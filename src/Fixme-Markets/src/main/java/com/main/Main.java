@@ -79,12 +79,9 @@ public class Main {
         // very first message is the ID sent by router
         socketChannel.read(byteBuffer);
         String routerOutput = new String(byteBuffer.array()).trim();
-        //printStr("Router routerOutput " + routerOutput + " * ****");
-        // if ID is not set, then this is the first message received ie.:ID
         if (ID.isEmpty()) {
             ID = routerOutput;
             System.out.println(" Market ID: " + routerOutput);
-
         }
         else {
 			// this is a message from the broker (request)
@@ -100,15 +97,14 @@ public class Main {
     }
 
     public static void handleRequest(SelectionKey key, String brokerRequest) {
-        // get the channel associated with this key
+        
         SocketChannel socketChannel = (SocketChannel) key.channel();
-        // split the brokerRequest string (currently in fix format)
         String[] requestSplit = brokerRequest.split("\\|");
-        // get broker request (buy/sell)
-        String choice = requestSplit[2];
+        String choice = requestSplit[1];
 
         // pre-allocate brokerRequest status (if market is able/unable to fulfill request)
-        String requestStatus = "accepted";
+        //printStr("Broker Request::::" + brokerRequest);
+        String requestStatus = "Accepted";
         if (choice.equals("1"))
             gold--;
 		else 

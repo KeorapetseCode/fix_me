@@ -22,7 +22,7 @@ public class Main {
 
     public static String ID = "";
 	public static int targetID = 0;
-	public static int cancel = 0;
+//	public static int cancel = 0;
 
     private static int gold;
     public static int choice = 1;
@@ -52,11 +52,10 @@ public class Main {
                     System.out.println("Breaking!!!!! from processKey");
                     break;
 				}
-				else if(cancel == 3)
-					break;
+			//	else if(cancel == 3)
+			//		break;
             }
         }
-        //printStr("Socket Is closing");
         socketChannel.close();
     }
 
@@ -86,7 +85,7 @@ public class Main {
             ID = routerOutput;
             System.out.println(" BroKer ID: " + routerOutput);
 		}
-		else {
+		else{
             System.out.println(" Server response: " + routerOutput);
             setAsset(routerOutput);
 		}
@@ -118,23 +117,22 @@ public class Main {
                     input = setFix(input);
 					socketChannel.write(ByteBuffer.wrap(input.getBytes()));
                     money = money - 20;
-                    printStr("Option 1 is sent");
 					return;
                 }
                 else if (input.equalsIgnoreCase("2")) {
-                    if (gold > 0){
-                        input = setFix(input);
-                        socketChannel.write(ByteBuffer.wrap(input.getBytes()));
-                        money = money + 20;
-                        printStr("Option 2 is sent");
-                        return;
-                    }
+                    input = setFix(input);
+                    socketChannel.write(ByteBuffer.wrap(input.getBytes()));
+                    money = money + 20;
+                    return;
                 }
                 else if(input.equalsIgnoreCase("exit")){
                     printStr("Closing Application");
                     socketChannel.write(ByteBuffer.wrap(input.getBytes()));
 				    socketChannel.close();
                     System.exit(0);
+                }
+                else{
+                    printStr("Invalid String");
                 }
             }
             catch (IOException e) {
@@ -144,11 +142,11 @@ public class Main {
     }
 
     public static String setFix(String choice) {
-        String fixed = ID + "|" + targetID + "|" + choice + "|" + Checksum(choice) + "|";
+        String fixed = ID + "|" + choice + "|" + checksumCreate(choice) + "|";
         return (fixed);
     }
 
-    public static long Checksum(String fixedBody) {
+    public static long checksumCreate(String fixedBody) {
         byte[] bytes = fixedBody.getBytes();
         CRC32 crc32 = new CRC32();
         crc32.update(bytes, 0, bytes.length);

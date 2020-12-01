@@ -4,6 +4,9 @@ public class Main {
     public static final int brokerPort = 5000;
     public static final int marketPort = 5001;
 
+    public static String Broker = "Broker";
+	public static String Market = "Market";
+
     private static String brokerMessages = "";
     private static String marketMessages = "";
 
@@ -13,8 +16,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-        RouterConnection brokerServer = new RouterConnection(brokerPort, TheComp.Broker);
-        RouterConnection marketServer = new RouterConnection(marketPort, TheComp.Market);
+        RouterConnection brokerServer = new RouterConnection(brokerPort, Broker);
+        RouterConnection marketServer = new RouterConnection(marketPort, Market);
 
         brokerServer.start();
         marketServer.start();
@@ -23,6 +26,7 @@ public class Main {
             brokerMessages = brokerServer.getMessages();
             if (brokerMessages != "null"){
 				try {
+//						printStr("")
 						if (brokerMessages.equals("exit")){
 
 							marketServer.sendMessage(brokerMessages);
@@ -35,7 +39,7 @@ public class Main {
 						}
 						String[] arr = brokerMessages.split("\\|");
 						String targetID = marketServer.getComponentId();
-						String brokerMessageTargeted = arr[0] + "|" + targetID + "|" + arr[2] + "|" + arr[3] + "|";
+						String brokerMessageTargeted = arr[0] + "|" + arr[1] + "|" + arr[2] + "|";
 						marketServer.sendMessage(brokerMessageTargeted);
 						brokerMessages = "null";
 
