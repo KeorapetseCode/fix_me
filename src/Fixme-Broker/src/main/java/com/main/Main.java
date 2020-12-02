@@ -86,7 +86,8 @@ public class Main {
             System.out.println(" BroKer ID: " + routerOutput);
 		}
 		else{
-            System.out.println(" Server response: " + routerOutput);
+            //System.out.println(" Server response: " + routerOutput);
+            //printStr("Rpouter Output!!" + routerOutput);
             setAsset(routerOutput);
 		}
 		Menu(socketChannel);
@@ -155,22 +156,20 @@ public class Main {
 
     public static void setAsset(String routerOutput) {
 
-        // split message to validate order status
         String[] routerOutputSplit = routerOutput.split("\\|");
 
+        //printStr("router Meassage " + routerOutputSplit[0]);
         if (routerOutputSplit[0].equals("accepted")) {
-            if (routerOutputSplit[3].equals("1")) {
+            if (routerOutputSplit[3].equals("1")) 
                 gold++;
-                printStr("Gold Asset: " + gold);
-            }
-            else{
+            else if (routerOutputSplit[3].equals("2"))
                 gold--;
-                printStr("Gold Asset: " + gold);
-            }
-            printStr(" order was sucessful and completed ");
+            printStr("Previous Order Was Successful");
         }
-        else {
-            printStr(" order was unsuccessful ");
+        else if (routerOutputSplit[0].equals("rejected")) {
+            printStr("Previous Order Was Unsuccessful ");
         }
+        if (gold > 0)
+            printStr("Personal Gold Asset" + gold);
     }
 }

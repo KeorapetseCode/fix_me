@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Random;
 import java.util.Iterator;
 
 public class Main {
@@ -38,7 +39,7 @@ public class Main {
                 }
                 if (processKey(key)) {
                     break;
-                }
+                    }
             }
         }
         socketChannel.close();
@@ -71,12 +72,10 @@ public class Main {
     }
 
     public static void readableKey(SelectionKey key) throws IOException {
-        // get channel associated with this key
+    
         SocketChannel socketChannel = (SocketChannel) key.channel();
-        // initialise buffer to read from channel
         byteBuffer = ByteBuffer.allocate(1024);
 
-        // very first message is the ID sent by router
         socketChannel.read(byteBuffer);
         String routerOutput = new String(byteBuffer.array()).trim();
         if (ID.isEmpty()) {
@@ -84,14 +83,11 @@ public class Main {
             System.out.println(" Market ID: " + routerOutput);
         }
         else {
-			// this is a message from the broker (request)
 			if (routerOutput.equals("exit")){
-				//printStr("EXIT in readable!!!");
                 socketChannel.close();
                 System.exit(0);
                 return ;
 			}
-            System.out.println(" Message from broker: " + routerOutput);
             handleRequest(key, routerOutput);
         }
     }
@@ -102,21 +98,20 @@ public class Main {
         String[] requestSplit = brokerRequest.split("\\|");
         String choice = requestSplit[1];
 
-        // pre-allocate brokerRequest status (if market is able/unable to fulfill request)
-        //printStr("Broker Request::::" + brokerRequest);
-        String requestStatus = "Accepted";
-        if (choice.equals("1"))
+        String[] requestStatus = {"accepted", "rejected"};
+        Random random = new Random();
+        String temp = requestStatus[random.nextInt(2)];
+        if (choice.equals("1") && temp.equals("accepted"))
             gold--;
-		else 
+		else if (choice.equals("2") && temp.equals("accepted"))
             gold++;
 
-        String marketReturn = requestStatus + "|" + brokerRequest;
+        String marketReturn = temp + "|" + brokerRequest;
         byteBuffer = ByteBuffer.wrap(marketReturn.getBytes());
-
         try {
             socketChannel.write(byteBuffer);
             printStr("Message from market: " + marketReturn + "\n Completed");
-            printStr("Gold Asset: " + gold);
+            printStr("Gold Stock: " + gold);
         }
         catch (IOException e) {
             printStr("request failed");

@@ -16,8 +16,8 @@ public class RouterConnection extends Thread {
     private String hostIP = "localhost";
     private int port;
 
-    private int brokerID = 10000;
-    private int marketID = 50000;
+    private int brokerID = 101;
+    private int marketID = 505;
 
     private int maxBrokerCount = 50000;
     private int maxMarketCount = 100000;

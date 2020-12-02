@@ -26,11 +26,9 @@ public class Main {
             brokerMessages = brokerServer.getMessages();
             if (brokerMessages != "null"){
 				try {
-//						printStr("")
 						if (brokerMessages.equals("exit")){
 
 							marketServer.sendMessage(brokerMessages);
-
 							brokerServer.socketHandlerAsync.interrupt();
 							marketServer.socketHandlerAsync.interrupt();
 							brokerServer.interrupt();
