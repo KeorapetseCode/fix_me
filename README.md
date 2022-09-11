@@ -18,7 +18,6 @@ The Market has a list of instruments that can be traded. When orders are receive
 # How To Run
  - $mvn clean package <br />
  - After building, I have written shell scripts to run each component independently. Each component will be ran on its own terminal window <br />
- - The user will be interacting with the broker componenent. The interaction will be in a form of buying and selling instruments on the stock market. Questions will pop up on the broker terminal window and each interaction will trigger the Router and the Market terminal window to respond accordingly based on the request that was sent by the broker.
-<br />
+ - The user will be interacting with the broker componenent. The interaction will be in a form of buying and selling instruments on the stock market. Questions will pop up on the broker terminal window and each interaction will trigger the Router and the Market terminal window to respond accordingly based on the request that was sent by the broker.<br />
 # Prerequisites
-  This is a command line program. javac, maven and java is to be installed prior.
+This is a command line program. javac, maven and java is to be installed prior.
